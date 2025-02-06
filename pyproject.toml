@@ -12,6 +12,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
+    "polars",
     "fastapi",
     "pydantic",
     "uvicorn",
