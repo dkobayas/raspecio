@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
 pub mod basic;
 pub mod spi_adc;
+pub mod i2c_adc;
 
 /// A Python module implemented in Rust.
 #[pymodule]
@@ -13,6 +14,7 @@ fn raspecio(m: &Bound<'_, PyModule>) -> PyResult<()> {
     let adc_module = PyModule::new(m.py(), "adc")?;
     adc_module.add_class::<spi_adc::MCP3204>()?;
     adc_module.add_class::<spi_adc::MCP3208>()?;
+    adc_module.add_class::<i2c_adc::ADS1015>()?;
     m.add_submodule(&adc_module)?;
     Ok(())
 }

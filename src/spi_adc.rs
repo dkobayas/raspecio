@@ -36,6 +36,7 @@ impl MCP3204 {
             let lsb = read_buffer[2] as u16; // Convert third byte to u16
             let result = (msb << 8) | lsb;
             result_vec.push(result);
+
         }
         return Ok(result_vec);
     }
@@ -72,8 +73,9 @@ impl MCP3204 {
                     _ => (),
                 }
                 ch_count += 1;
+                thread::sleep(time::Duration::from_micros(10));
             }
-            thread::sleep(time::Duration::from_millis(sleep_msec as u64));
+            thread::sleep(time::Duration::from_millis(sleep_msec as u64 - 40));
         }
         let data = df!(
             "Time(sec)" => time_vec,
@@ -98,7 +100,7 @@ impl MCP3208 {
     fn new(spi_num: u8) -> Self {
         MCP3208 { 
             spi_num: spi_num,
-            ch_bits: [0x06 | 0x00, 0x06 | 0x40, 0x06 | 0x80, 0x06 | 0xC0, 0x06 | 0x10, 0x06 | 0x50, 0x06 | 0x90, 0x06 | 0xD0],
+            ch_bits: [0x00, 0x40, 0x80, 0xC0, 0x00, 0x40, 0x80, 0xC0],
         }
     }
 
@@ -110,9 +112,9 @@ impl MCP3208 {
         };
 
         let mut result_vec = Vec::new();
-        for channel_bit in self.ch_bits {
+        for ch_bit in self.ch_bits {
             let mut read_buffer = [0u8; 3];
-            let write_buffer = [channel_bit, 0x00, 0x00];
+            let write_buffer = [0x06, ch_bit, 0x00];
             spi.transfer(&mut read_buffer, &write_buffer).unwrap();
             let msb = (read_buffer[1] & 0x0F) as u16;
             let lsb = read_buffer[2] as u16; // Convert third byte to u16
@@ -161,8 +163,9 @@ impl MCP3208 {
                     _ => (),
                 }
                 ch_count += 1;
+                thread::sleep(time::Duration::from_micros(10));
             }
-            thread::sleep(time::Duration::from_millis(sleep_msec as u64));
+            thread::sleep(time::Duration::from_millis(sleep_msec as u64 - 40));
         }
         let data = df!(
             "Time(sec)" => time_vec,
